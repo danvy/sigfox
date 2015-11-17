@@ -1,0 +1,10 @@
+{
+  "AppSettings": {
+    "SiteTitle": "SignatureGenerator"
+  },
+  "Data": {
+    "DefaultConnection": {
+      "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=aspnet5-SignatureGenerator-ea35bfc3-2124-4809-ad08-f45d306dfc31;Trusted_Connection=True;MultipleActiveResultSets=true"
+    }
+  }
+}
