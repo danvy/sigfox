@@ -18,8 +18,8 @@ namespace SigfoxEventSimulator
         {
             Console.CancelKeyPress += Console_CancelKeyPress;
             var data = new DeviceData();
-            data.Device = "SIMUL001";
-            var sas = "SharedAccessSignature sr=https%3a%2f%2fsigfox.servicebus.windows.net%2fsigfox%2fpublishers%2fsimul001%2fmessages&sig=N0ektKSEMjBzgyK49AKGxkneN14MiFDjvKknh49Der4%3d&se=1450191638&skn=device";
+            data.Device = "d1";
+            var sas = "SharedAccessSignature sr=https%3A%2F%2Fsigfox.servicebus.windows.net%2Fsigfox%2Fpublishers%2Fd1%2Fmessages&sig=80%2Fof8wW6u7Ne8Z6NQLqOjlr5UmdFnKrzt%2FOzXzj93Q%3D&se=1462320741&skn=device";
             var serviceNamespace = "sigfox";
             var hubName = "sigfox";
             var url = string.Format("{0}/publishers/{1}/messages", hubName, data.Device);
