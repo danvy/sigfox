@@ -12,36 +12,37 @@ using SigfoxCloud.Models;
 
 namespace SigfoxCloud.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class GatewayController : Controller
     {
-        Dictionary<string, DeviceModel> _whiteList = new Dictionary<string, DeviceModel>();
-        DeviceClient _client = null;
+        static Dictionary<string, DeviceModel> _whiteList = new Dictionary<string, DeviceModel>();
+        static DeviceClient _client = null;
         ServiceSettingsModel _serviceSettings;
-
+        static StringBuilder _log = new StringBuilder();
         public GatewayController(IOptions<ServiceSettingsModel> serviceSettings)
         {
             _serviceSettings = serviceSettings?.Value;
         }
-        // GET: api/values
-        //[HttpGet]
-        //public IEnumerable<string> Get()
-        //{
-        //    return new string[] { "value1", "value2" };
-        //}
-
-        // GET api/values/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
-
-        // POST api/values
-        [HttpPost]
-        public async void Post([FromBody]string value)
+        [HttpGet]
+        public string Get()
         {
-            var payload = JsonConvert.DeserializeObject<PayloadModel>(value);
+            return _log.ToString();
+        }
+        private void AddLog(string value)
+        {
+            if (_log.Length > 4096)
+            {
+                _log.Remove(4096, _log.Length - 4096);
+            }
+            _log.AppendLine(string.Format("{0}:{1}", DateTime.UtcNow, value));
+        }
+        [HttpPost]
+        public async void Post([FromBody]PayloadModel payload)
+        {
+            if (payload == null)
+                return;
+            payload.device = "Sigfox-" + payload.device;
+            AddLog("Device=" + payload.device + " Data=" + payload.data);
             // Temp & humidity payload
             if ((payload.byte1 % 8) == 1)
             {
@@ -104,6 +105,7 @@ namespace SigfoxCloud.Controllers
             data.Temperature = temperature;
             data.Humidity = humidity;
             var content = JsonConvert.SerializeObject(data);
+            AddLog("Device=" + payload.device + " Telemetry=" + content);
             await _client.SendEventAsync(new Message(Encoding.UTF8.GetBytes(content)));
         }
         // PUT api/values/5

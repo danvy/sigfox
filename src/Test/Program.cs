@@ -106,6 +106,8 @@ namespace Test
             var connectionString = string.Format("HostName={0}.azure-devices.net;SharedAccessKeyName={1};SharedAccessKey={2}",
                             "sigfoxmonitoring", "iothubowner", "B2LsypvIEz7bdy0217QYfeUvO1xUjKVujlte4wETrvM=");
             var registry = Microsoft.Azure.Devices.RegistryManager.CreateFromConnectionString(connectionString);
+            await registry.RemoveDeviceAsync("Sigfox-FAE88");
+            return;
             var deviceReg = await registry.GetDeviceAsync(deviceId);
             if (deviceReg == null)
             {
