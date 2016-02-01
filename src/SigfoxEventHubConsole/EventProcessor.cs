@@ -35,7 +35,7 @@ namespace SigfoxEventHubConsole
                 foreach (var eventData in messages)
                 {
                     var s = Encoding.UTF8.GetString(eventData.GetBytes());
-                    Console.WriteLine("EventData: {0}" + s);
+                    Console.WriteLine(string.Format("EventData: {0}", s));
                 }
                 if (this.checkpointStopWatch.Elapsed > TimeSpan.FromSeconds(10))
                 {
