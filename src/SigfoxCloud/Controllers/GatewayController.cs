@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IoTSuiteLib;
@@ -17,24 +16,11 @@ namespace SigfoxCloud.Controllers
     {
         static Dictionary<string, DeviceModel> _whiteList = new Dictionary<string, DeviceModel>();
         static DeviceClient _client = null;
-        ServiceSettingsModel _serviceSettings;
+        ServiceSettingsModel _serviceSettings = null;
         static StringBuilder _log = new StringBuilder();
         public GatewayController(IOptions<ServiceSettingsModel> serviceSettings)
         {
             _serviceSettings = serviceSettings?.Value;
-        }
-        [HttpGet]
-        public string Get()
-        {
-            return _log.ToString();
-        }
-        private void AddLog(string value)
-        {
-            if (_log.Length > 4096)
-            {
-                _log.Remove(4096, _log.Length - 4096);
-            }
-            _log.AppendLine(string.Format("{0}:{1}", DateTime.UtcNow, value));
         }
         [HttpPost]
         public async void Post([FromBody]PayloadModel payload)
@@ -53,6 +39,8 @@ namespace SigfoxCloud.Controllers
         private async Task CheckDeviceAsync(string deviceId)
         {
             if (_whiteList.ContainsKey(deviceId))
+                return;
+            if (_serviceSettings == null)
                 return;
             var connectionString = string.Format("HostName={0}.azure-devices.net;SharedAccessKeyName={1};SharedAccessKey={2}",
                             _serviceSettings.Host, _serviceSettings.KeyName, _serviceSettings.Key);
@@ -107,6 +95,19 @@ namespace SigfoxCloud.Controllers
             var content = JsonConvert.SerializeObject(data);
             AddLog("Device=" + payload.device + " Telemetry=" + content);
             await _client.SendEventAsync(new Message(Encoding.UTF8.GetBytes(content)));
+        }
+        [HttpGet]
+        public string Get()
+        {
+            return _log.ToString();
+        }
+        private void AddLog(string value)
+        {
+            if (_log.Length > 4096)
+            {
+                _log.Remove(4096, _log.Length - 4096);
+            }
+            _log.AppendLine(string.Format("{0}:{1}", DateTime.UtcNow, value));
         }
         // PUT api/values/5
         //[HttpPut("{id}")]

@@ -23,7 +23,7 @@ namespace SigfoxEventHubConsole
             var eventHubClient = EventHubClient.CreateFromConnectionString(busConnectionString, eventHubName);
             if (consumerGroup == null)
                 consumerGroup = eventHubClient.GetDefaultConsumerGroup().GroupName;
-            var eventProcessorHost = new EventProcessorHost("singleworker", eventHubClient.Path,
+            var eventProcessorHost = new EventProcessorHost("logger", eventHubClient.Path,
                 consumerGroup, busConnectionString, storageConnectionString, eventHubName.ToLowerInvariant());
             eventProcessorHost.RegisterEventProcessorAsync<EventProcessor>().Wait();
             while (true)
