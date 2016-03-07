@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +18,20 @@ namespace Test
 
         static void Main(string[] args)
         {
+            UInt32 p = 1457128028; //01010110 11011010 00000010 01011100
+            var p0 = p & 0xFF; //01011100
+            var t2 = Math.Floor(Math.Floor(p0 / Math.Pow(2, 5)) * Math.Pow(2, 5));
+            var t = Math.Floor(Math.Floor(p / Math.Pow(2, 28)) * Math.Pow(2, 28));
+            var m = Math.Floor(p / Math.Pow(2, 29));
+            p = 0xF0;
+            Debug.WriteLine(Convert.ToString(p, (int)2));
+            var pe = Convert.ToInt32(Math.Floor(p / Math.Pow(2, 2)));
+            Debug.WriteLine(Convert.ToString(pe, (int)2));
+            pe = Convert.ToInt32(Math.Floor(pe * Math.Pow(2, 2)));
+            Debug.WriteLine(Convert.ToString(pe, (int)2));
+            pe = Convert.ToInt32(Math.Floor(pe * Math.Pow(2, 2)));
+            Debug.WriteLine(Convert.ToString(pe, 2));
+            return;
             var payload = new PayloadModel();
             payload.device = "Sigfox-FAE83";
             payload.byte1 = 137;
@@ -46,54 +61,54 @@ namespace Test
             //bleu foncé
             //ac5d3418 mode: 172 temperatureMSB: 93 temperatureLSB: 52
             //humidity: 24 temp: 6196 temp2: 13336
-            foreach (var p in payloads)
-            {
-                var bytes = BitConverter.GetBytes(p);
-                Array.Reverse(bytes);
-                if ((bytes[0] % 8) == 1)
-                {
-                    //MSB : Les 4 premiers bits de l'octet temperatureMSB
-                    var MSB = Math.Floor(bytes[1] / Math.Pow(2, 4));
-                    var LSB = bytes[2] % 64;
-                    //On concatene les deux : MSB+LSB, on retranche 200 puis on divise par 8
-                    //On obtient la temperature en °C
-                    var temperature = (((MSB * Math.Pow(2, 6)) + LSB) - 200) / 8;
-                    var humidity = bytes[3] * 0.5;
-                    Console.WriteLine(string.Format("Payload={0} temperature={1} humidity={2}", p, temperature, humidity));
-                }
-                //var mode = (p1 << 29) >> 29;
-                //var timeframe = (p1 << 27) >> 30;
-                //var type = (p1 << 25) >> 30;
-                //var battery = (((p1 << 24) >> 27)) * 0.05 * 2.7;
-                //var temp1 = 0; // ((Convert.ToInt16(new byte[] { (byte)(bytes[1] % 64), (byte)((bytes[2] << 2) >> 6)})));
-                ////temp1 = 5.0 / 9.0 * (temp1 - 32);
-                //double hum = 0;
-                //double temp = 0;
-                //switch (type)
-                //{
-                //    case 0: //Button
-                //        break;
-                //    case 1: //Temp-Humidity
-                //        hum = ((p1 << 0) >> 24) * 2;
-                //        temp = (((p1 << 20) >> 28) * 0.01) + 20;
-                //        temp = ((p1 << 12) >> 28) << 5;
-                //        temp += ((p << 20) >> 28);
-                //        temp = (temp - 200) / 8;
-                //        break;
-                //    case 2: //Light
-                //        break;
-                //    case 3: //Door
-                //        break;
-                //    case 4: //Move
-                //        break;
-                //    case 5: //Reed switch
-                //        break;
-                //    default:
-                //        break;
-                //}
-                //Console.WriteLine(string.Format("mode={0} time={1} type={2} battery={3} temp1={4} temp={5} hum={6}", mode, timeframe, type, battery, temp1, temp, hum));
-                //Console.WriteLine();
-            }
+            //foreach (var p in payloads)
+            //{
+            //    var bytes = BitConverter.GetBytes(p);
+            //    Array.Reverse(bytes);
+            //    if ((bytes[0] % 8) == 1)
+            //    {
+            //        //MSB : Les 4 premiers bits de l'octet temperatureMSB
+            //        var MSB = Math.Floor(bytes[1] / Math.Pow(2, 4));
+            //        var LSB = bytes[2] % 64;
+            //        //On concatene les deux : MSB+LSB, on retranche 200 puis on divise par 8
+            //        //On obtient la temperature en °C
+            //        var temperature = (((MSB * Math.Pow(2, 6)) + LSB) - 200) / 8;
+            //        var humidity = bytes[3] * 0.5;
+            //        Console.WriteLine(string.Format("Payload={0} temperature={1} humidity={2}", p, temperature, humidity));
+            //    }
+            //    //var mode = (p1 << 29) >> 29;
+            //    //var timeframe = (p1 << 27) >> 30;
+            //    //var type = (p1 << 25) >> 30;
+            //    //var battery = (((p1 << 24) >> 27)) * 0.05 * 2.7;
+            //    //var temp1 = 0; // ((Convert.ToInt16(new byte[] { (byte)(bytes[1] % 64), (byte)((bytes[2] << 2) >> 6)})));
+            //    ////temp1 = 5.0 / 9.0 * (temp1 - 32);
+            //    //double hum = 0;
+            //    //double temp = 0;
+            //    //switch (type)
+            //    //{
+            //    //    case 0: //Button
+            //    //        break;
+            //    //    case 1: //Temp-Humidity
+            //    //        hum = ((p1 << 0) >> 24) * 2;
+            //    //        temp = (((p1 << 20) >> 28) * 0.01) + 20;
+            //    //        temp = ((p1 << 12) >> 28) << 5;
+            //    //        temp += ((p << 20) >> 28);
+            //    //        temp = (temp - 200) / 8;
+            //    //        break;
+            //    //    case 2: //Light
+            //    //        break;
+            //    //    case 3: //Door
+            //    //        break;
+            //    //    case 4: //Move
+            //    //        break;
+            //    //    case 5: //Reed switch
+            //    //        break;
+            //    //    default:
+            //    //        break;
+            //    //}
+            //    //Console.WriteLine(string.Format("mode={0} time={1} type={2} battery={3} temp1={4} temp={5} hum={6}", mode, timeframe, type, battery, temp1, temp, hum));
+            //    //Console.WriteLine();
+            //}
             #endregion
             Console.Read();
         }
