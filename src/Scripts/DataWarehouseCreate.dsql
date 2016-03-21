@@ -1,0 +1,26 @@
+﻿CREATE TABLE dbo.[Message]
+(
+    Id INT,
+    Device varchar,
+    Data int,
+    Mode tinyint,
+    Periode tinyint,
+    FrameType tinyint,
+    Battery float,
+    Temperature float,
+    Humidity float,
+    ILS bit,
+    Light float,
+    [Version] varchar,
+    AlertCount int,
+    [TimeStamp] DateTime,
+    Duplicate bit,
+    Signal float,
+    Station varchar,
+    AvgSignal float,
+    Latitude float,
+    Longitude float,
+    Rssi float,
+    SeqNumber int
+) WITH ( CLUSTERED COLUMNSTORE INDEX );
+GO

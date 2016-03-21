@@ -79,16 +79,16 @@ namespace DecoderJob
             decoded.Signal = raw.Signal;
             decoded.Station = raw.Station;
             decoded.Time = raw.Time;
-            var d = Convert.ToInt32(raw.Data);
-            decoded.Mode = (Mode)(d >> 28);
-            decoded.Periode = (Periode)((d << 3) >> 29);
-            decoded.Type = (FrameType)((d << 5) >> 29);
-            decoded.Battery = Convert.ToByte(((d << 7) >> 26) * 0.05 + 2.7);
-            decoded.Temperature = Convert.ToSingle(((d << 12) >> 27) * 6.4 - 20);
+            var d = BitConverter.GetBytes(raw.Data).Reverse().ToArray();
+            decoded.Mode = (Mode)(d[0] & 0x7);
+            decoded.Periode = (Periode)((d[0] & 0x18) >> 3);
+            decoded.Type = (FrameType)((d[0] >> 4) & 0x3);
+            decoded.Battery = (((d[0] >> 7) * 16) + (d[1] >> 4) + 54) / 20.0;
+            decoded.Temperature = ((d[1] & 0xF) * 64 - 200) / 10.0;
             if ((decoded.Type == FrameType.Regular) && (decoded.Mode == Mode.Light))
             {
-                var valeur = (d << 12) >> 25;
-                var multi = (d << 18) >> 29;
+                var valeur = (d[2] << 2) >> 2;
+                var multi = d[2] >> 6;
                 switch (multi)
                 {
                     case 0:
@@ -113,22 +113,22 @@ namespace DecoderJob
             }
             else
             {
-                decoded.Temperature = (((d << 12) >> 21) - 200) / 8;
-                decoded.ILS = (d << 22) >> 30 == 1;
+                decoded.Temperature = (((d[1] >> 4) << 6) + (d[2] & 0x3F) - 200) / 8.0;
+                decoded.ILS = (d[2] & 0x20) != 0;
             }
             //Button
             if (decoded.Mode == Mode.Button)
             {
-                decoded.Version = string.Format("{0}.{1}", ((d << 28) >> 27), ((d << 24) >> 27));
+                decoded.Version = new Version(string.Format("{0}.{1}", d[3] >> 4, d[3] & 0xF));
             }
             //Temperature
             else if (decoded.Mode == Mode.TemperatureHumidity)
             {
-                decoded.Humidity = Convert.ToSingle(((d << 24) >> 24) * 0.5);
+                decoded.Humidity = d[3] * 0.5;
             }
             else
             {
-                decoded.AlertCount = ((d << 24) >> 24);
+                decoded.AlertCount = Convert.ToInt32(d[3]);
             }
             return decoded;
         }
