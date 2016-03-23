@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Danvy.Azure;
 using Microsoft.ServiceBus.Messaging;
 using Newtonsoft.Json;
 
@@ -17,34 +18,63 @@ namespace DecoderJob
         EventHubClient hubClient;
         public async Task CloseAsync(PartitionContext context, CloseReason reason)
         {
-            Console.WriteLine(string.Format("Processor Shuting Down. Partition '{0}', Reason: '{1}'.",
-                partitionContext.Lease.PartitionId, reason.ToString()));
+            if (!WebJobsHelper.RunAsWebJobs)
+                Console.WriteLine(string.Format("Processor Shuting Down. Partition '{0}', Reason: '{1}'.",
+                    partitionContext.Lease.PartitionId, reason.ToString()));
             if (reason == CloseReason.Shutdown)
                 await context.CheckpointAsync();
         }
         public Task OpenAsync(PartitionContext context)
         {
-            Console.WriteLine(string.Format("EventProcessor initialization. Partition: '{0}', Offset: '{1}'",
-                context.Lease.PartitionId, context.Lease.Offset));
+            if (!WebJobsHelper.RunAsWebJobs)
+                Console.WriteLine(string.Format("EventProcessor initialization. Partition: '{0}', Offset: '{1}'",
+                    context.Lease.PartitionId, context.Lease.Offset));
             partitionContext = context;
-            hubClient = EventHubClient.CreateFromConnectionString(ConfigurationManager.ConnectionStrings["DestinationBusConnectionString"].ConnectionString,
-                ConfigurationManager.AppSettings["DestinationEventHubName"]);
+            var retries = 3;
+            while (retries > 0)
+            {
+                try
+                {
+                    retries--;
+                    hubClient = EventHubClient.CreateFromConnectionString(ConfigurationManager.ConnectionStrings["DestinationBusConnectionString"].ConnectionString,
+                        ConfigurationManager.AppSettings["DestinationEventHubName"]);
+                    retries = 0;
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("Error opening destination Event Hub: " + e.Message);
+                    if (retries == 0)
+                        throw;
+                }
+            }
             checkpointStopWatch = new Stopwatch();
             checkpointStopWatch.Start();
             return Task.FromResult<object>(null);
         }
         public async Task ProcessEventsAsync(PartitionContext context, IEnumerable<EventData> messages)
         {
+            if (hubClient == null)
+                return;
             try
             {
                 foreach (var message in messages)
                 {
                     var rawMessage = Encoding.UTF8.GetString(message.GetBytes());
-                    Console.WriteLine(string.Format("EventData Source: {0}", rawMessage));
-                    var raw = JsonConvert.DeserializeObject<RawMessage>(rawMessage);
+                    if (!WebJobsHelper.RunAsWebJobs)
+                        Console.WriteLine(string.Format("EventData Source: {0}", rawMessage));
+                    RawMessage raw = null;
+                    try
+                    {
+                        raw = JsonConvert.DeserializeObject<RawMessage>(rawMessage);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Error.WriteLine("Error deserializing a message:\n" + e.Message + "\n" + rawMessage);
+                    }
                     var decoded = DecodeMessage(raw);
                     var decodedMessage = JsonConvert.SerializeObject(decoded);
-                    Console.WriteLine(string.Format("EventData Destination: {0}", decodedMessage));
+                    //if (!WebJobsHelper.RunAsWebJobs)
+                        Console.Out.WriteLine(string.Format("EventData Destination: {0}", decodedMessage));
                     hubClient.Send(new EventData(Encoding.UTF8.GetBytes(decodedMessage)));
                 }
                 if (this.checkpointStopWatch.Elapsed > TimeSpan.FromSeconds(10))
@@ -57,11 +87,9 @@ namespace DecoderJob
                     }
                 }
             }
-            catch (Exception exp)
+            catch (Exception e)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Error in processing: " + exp.Message);
-                Console.ResetColor();
+                Console.Error.WriteLine("Error getting messages:" + e.Message);
             }
         }
 
@@ -79,7 +107,7 @@ namespace DecoderJob
             decoded.Signal = raw.Signal;
             decoded.Station = raw.Station;
             decoded.Time = raw.Time;
-            var d = BitConverter.GetBytes(raw.Data).Reverse().ToArray();
+            var d = StringToByteArray(raw.Data);
             decoded.Mode = (Mode)(d[0] & 0x7);
             decoded.Periode = (Periode)((d[0] & 0x18) >> 3);
             decoded.Type = (FrameType)((d[0] >> 4) & 0x3);
@@ -131,6 +159,13 @@ namespace DecoderJob
                 decoded.AlertCount = Convert.ToInt32(d[3]);
             }
             return decoded;
+        }
+        public byte[] StringToByteArray(string hex)
+        {
+            return Enumerable.Range(0, hex.Length)
+                             .Where(x => x % 2 == 0)
+                             .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                             .ToArray();
         }
     }
 }

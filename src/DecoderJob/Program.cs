@@ -7,12 +7,13 @@ using Microsoft.ServiceBus.Messaging;
 using System.IO;
 using System.Configuration;
 using System.Threading;
+using Danvy.Azure;
 
 namespace DecoderJob
 {
     class Program
     {
-        static bool breaking = false;
+        static bool quit = false;
         public static void Main()
         {
             var settings = ConfigurationManager.AppSettings;
@@ -21,8 +22,25 @@ namespace DecoderJob
             var connections = ConfigurationManager.ConnectionStrings;
             var busConnectionString = connections["SourceBusConnectionString"].ConnectionString;
             var storageConnectionString = connections["SourceStorageConnectionString"].ConnectionString;
-            Console.CancelKeyPress += Console_CancelKeyPress;
-            var eventHubClient = EventHubClient.CreateFromConnectionString(busConnectionString, eventHubName);
+            if (!WebJobsHelper.RunAsWebJobs)
+                Console.CancelKeyPress += Console_CancelKeyPress;
+            EventHubClient eventHubClient = null;
+            var retries = 3;
+            while (retries > 0)
+            {
+                try
+                {
+                    retries--;
+                    eventHubClient = EventHubClient.CreateFromConnectionString(busConnectionString, eventHubName);
+                    retries = 0;
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("Error opening source Event Hub: " + e.Message);
+                    if (retries == 0)
+                        throw;
+                }
+            }
             if (consumerGroup == null)
                 consumerGroup = eventHubClient.GetDefaultConsumerGroup().GroupName;
             var eventProcessorHost = new EventProcessorHost(settings["EventProcessorName"], eventHubClient.Path,
@@ -30,16 +48,23 @@ namespace DecoderJob
             eventProcessorHost.RegisterEventProcessorAsync<EventProcessor>().Wait();
             while (true)
             {
-                Console.WriteLine("Waiting for new messages " + DateTime.UtcNow);
-                Thread.Sleep(1000);
-                if (breaking)
+                if (WebJobsHelper.RunAsWebJobs)
+                {
+                    Thread.Sleep(50);
+                }
+                else
+                {
+                    Console.WriteLine("Waiting for new messages " + DateTime.UtcNow);
+                    Thread.Sleep(1000);
+                }
+                if (quit || WebJobsHelper.NeedShutdown)
                     break;
             }
             eventProcessorHost.UnregisterEventProcessorAsync().Wait();
         }
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
-            breaking = true;
+            quit = true;
         }
     }
 }

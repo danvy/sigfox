@@ -9,7 +9,7 @@ namespace DecoderJob
     public class DecodedMessage
     {
         public string Device { get; set; }
-        public UInt32 Data { get; set; }
+        public string Data { get; set; }
         public Mode Mode { get; set; }
         public Periode Periode { get; set; }
         public FrameType Type { get; set; }

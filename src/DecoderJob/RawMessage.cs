@@ -10,8 +10,7 @@ namespace DecoderJob
     public class RawMessage
     {
         public string Device { get; set; }
-        [JsonConverter(typeof(HexUInt32Converter))]
-        public UInt32 Data { get; set; }
+        public string Data { get; set; }
         [JsonConverter(typeof(SecondEpochConverter))]
         public DateTime Time { get; set; }
         public bool Duplicate { get; set; }
