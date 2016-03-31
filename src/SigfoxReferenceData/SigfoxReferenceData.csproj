@@ -79,9 +79,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SigfoxLib\SigfoxLib.csproj">
+    <ProjectReference Include="..\SigfoxLib\SensitLib.csproj">
       <Project>{10aac5b1-c6bc-4b59-afe2-35e6b2ef0276}</Project>
-      <Name>SigfoxLib</Name>
+      <Name>SensitLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

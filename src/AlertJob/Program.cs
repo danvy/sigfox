@@ -8,20 +8,20 @@ using System.IO;
 using System.Configuration;
 using System.Threading;
 using Danvy.Azure;
-using Microsoft.Azure;
 
-namespace DecoderJob
+namespace AlertJob
 {
     class Program
     {
         static bool quit = false;
         public static void Main()
         {
-            var eventHubName = "sigfoxdemo";
-            var consumerGroup = "decoder";
-            var eventProcessorName = "DecoderProcessor";
-            var busConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoServiceBus"].ConnectionString;
-            var storageConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoStorage"].ConnectionString;
+            var settings = ConfigurationManager.AppSettings;
+            var eventHubName = settings["EventHubName"];
+            var consumerGroup = settings["ConsumerGroup"];
+            var connections = ConfigurationManager.ConnectionStrings;
+            var busConnectionString = connections["BusConnectionString"].ConnectionString;
+            var storageConnectionString = connections["StorageConnectionString"].ConnectionString;
             if (!WebJobsHelper.RunAsWebJobs)
                 Console.CancelKeyPress += Console_CancelKeyPress;
             EventHubClient eventHubClient = null;
@@ -43,7 +43,7 @@ namespace DecoderJob
             }
             if (consumerGroup == null)
                 consumerGroup = eventHubClient.GetDefaultConsumerGroup().GroupName;
-            var eventProcessorHost = new EventProcessorHost(eventProcessorName, eventHubClient.Path,
+            var eventProcessorHost = new EventProcessorHost(settings["EventProcessorName"], eventHubClient.Path,
                 consumerGroup, busConnectionString, storageConnectionString, eventHubName.ToLowerInvariant());
             eventProcessorHost.RegisterEventProcessorAsync<EventProcessor>().Wait();
             while (true)

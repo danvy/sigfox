@@ -8,7 +8,6 @@ using System.IO;
 using System.Configuration;
 using System.Threading;
 using Danvy.Azure;
-using Microsoft.Azure;
 
 namespace DecoderJob
 {
@@ -17,9 +16,9 @@ namespace DecoderJob
         static bool quit = false;
         public static void Main()
         {
-            var eventHubName = "sigfoxdemo";
-            var consumerGroup = "decoder";
-            var eventProcessorName = "DecoderProcessor";
+            var eventHubName = "alert";
+            var consumerGroup = "email";
+            var eventProcessorName = "EmailAlertProcessor";
             var busConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoServiceBus"].ConnectionString;
             var storageConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoStorage"].ConnectionString;
             if (!WebJobsHelper.RunAsWebJobs)

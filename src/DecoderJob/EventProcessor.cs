@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Danvy.Azure;
 using Microsoft.ServiceBus.Messaging;
 using Newtonsoft.Json;
+using SensitLib;
 
 namespace DecoderJob
 {
@@ -36,8 +37,9 @@ namespace DecoderJob
                 try
                 {
                     retries--;
-                    hubClient = EventHubClient.CreateFromConnectionString(ConfigurationManager.ConnectionStrings["DestinationBusConnectionString"].ConnectionString,
-                        ConfigurationManager.AppSettings["DestinationEventHubName"]);
+                    hubClient = EventHubClient.CreateFromConnectionString(
+                        ConfigurationManager.ConnectionStrings["SigfoxDemoDispatchSender"].ConnectionString,
+                        "dispatch");
                     retries = 0;
                 }
                 catch (Exception e)

@@ -6,9 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Newtonsoft.Json;
-using SigfoxLib;
 
-namespace SigfoxDeviceSimulation
+namespace DeviceSimulator
 {
     class Program
     {
@@ -21,7 +20,7 @@ namespace SigfoxDeviceSimulation
         static void Main(string[] args)
         {
             Console.CancelKeyPress += Console_CancelKeyPress;
-            Containers.Init();
+            Devices.Init();
             httpClient = new HttpClient()
             {
                 BaseAddress = new Uri(string.Format("https://{0}.servicebus.windows.net/", serviceNamespace))
@@ -30,13 +29,13 @@ namespace SigfoxDeviceSimulation
             //var client = EventHubClient.CreateFromConnectionString("Endpoint=http://sigfox.servicebus.windows.net;SharedSecretIssuer=sigfox;SharedSecretValue=nyXvyZezWGZE5KX9eUYVJ7v/XHVG/l8uBB0cYr7zt0sGXTNq0W6JggC6jxDQSySQXIongfoXqrtA2CaXomc/Vg==", "sigfox");
             while (!breaking)
             {
-                foreach (var container in Containers.Instance)
+                foreach (var container in Devices.Instance)
                 {
                     if (breaking)
                         break;
                     if (rnd.Next(10) > 7)
                     {
-                        container.Update();
+                        Device.Update();
                         try
                         {
                             var rc = PostEvent(container);
@@ -51,7 +50,7 @@ namespace SigfoxDeviceSimulation
             }
         }
             
-        private static bool PostEvent(Container device)
+        private static bool PostEvent(Device device)
         {
             try
             {

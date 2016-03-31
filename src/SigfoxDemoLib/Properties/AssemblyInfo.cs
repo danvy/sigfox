@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DecoderJob")]
+[assembly: AssemblyTitle("SigfoxDemoLib")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DecoderJob")]
+[assembly: AssemblyProduct("SigfoxDemoLib")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("6045f1c0-1b65-4aa6-8f03-92dfdb600c2d")]
+[assembly: Guid("1ff45cef-823d-4a43-a1c6-b5ba6d4a385e")]
 
 // Version information for an assembly consists of the following four values:
 //
