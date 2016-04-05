@@ -16,12 +16,10 @@ namespace AlertJob
         static bool quit = false;
         public static void Main()
         {
-            var settings = ConfigurationManager.AppSettings;
-            var eventHubName = settings["EventHubName"];
-            var consumerGroup = settings["ConsumerGroup"];
-            var connections = ConfigurationManager.ConnectionStrings;
-            var busConnectionString = connections["BusConnectionString"].ConnectionString;
-            var storageConnectionString = connections["StorageConnectionString"].ConnectionString;
+            var eventHubName = "dispatch";
+            var consumerGroup = "alert";
+            var busConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoServiceBus"].ConnectionString;
+            var storageConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoStorage"].ConnectionString;
             if (!WebJobsHelper.RunAsWebJobs)
                 Console.CancelKeyPress += Console_CancelKeyPress;
             EventHubClient eventHubClient = null;
@@ -43,7 +41,7 @@ namespace AlertJob
             }
             if (consumerGroup == null)
                 consumerGroup = eventHubClient.GetDefaultConsumerGroup().GroupName;
-            var eventProcessorHost = new EventProcessorHost(settings["EventProcessorName"], eventHubClient.Path,
+            var eventProcessorHost = new EventProcessorHost(eventHubName, eventHubClient.Path,
                 consumerGroup, busConnectionString, storageConnectionString, eventHubName.ToLowerInvariant());
             eventProcessorHost.RegisterEventProcessorAsync<EventProcessor>().Wait();
             while (true)

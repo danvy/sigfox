@@ -116,6 +116,10 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="ConnectionStrings.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\sigfoxdemo - Web Deploy.pubxml" />
     <None Include="Properties\webjob-publish-settings.json" />
@@ -133,6 +137,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SigfoxDemoLib\SigfoxDemoLib.csproj">
+      <Project>{1ff45cef-823d-4a43-a1c6-b5ba6d4a385e}</Project>
+      <Name>SigfoxDemoLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SigfoxLib\SensitLib.csproj">
       <Project>{10aac5b1-c6bc-4b59-afe2-35e6b2ef0276}</Project>
       <Name>SensitLib</Name>

@@ -14,6 +14,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using SensitLib;
+using SigfoxDemoLib;
 using StackExchange.Redis;
 
 namespace AlertJob
@@ -23,10 +24,10 @@ namespace AlertJob
         PartitionContext partitionContext;
         Stopwatch checkpointStopWatch;
         EventHubClient hubClient;
-        CloudStorageAccount storageAccount;
-        private CloudBlobContainer blobContainer;
+        //CloudStorageAccount storageAccount;
+        //private CloudBlobContainer blobContainer;
         private SqlConnection sqlConnection;
-        private SqlCommand sqlCommand;
+        //private SqlCommand sqlCommand;
         private ConnectionMultiplexer cacheConnection;
         private IDatabase cacheDatabase;
 
@@ -75,8 +76,8 @@ namespace AlertJob
         }
         public async Task ProcessEventsAsync(PartitionContext context, IEnumerable<EventData> messages)
         {
-            if (blobContainer == null)
-                return;
+            //if (blobContainer == null)
+            //    return;
             try
             {
                 foreach (var message in messages)
@@ -131,10 +132,11 @@ namespace AlertJob
             }
             if (cached == null)
                 return;
-            if (Math.Abs(message.Temperature - cached.Temperature) > 10)
+            if ((message.Mode == Mode.Button) || (Math.Abs(message.Temperature - cached.Temperature) > 10))
             {
-                //var alertMessage = new AlertMessage();
-                //hubClient.Send(new EventData(Encoding.UTF8.GetBytes(alertMessage)));
+                var alert = new AlertMessage();
+                var alertMessage = JsonConvert.SerializeObject(alert);
+                await hubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(alertMessage)));
             }
         }
     }
