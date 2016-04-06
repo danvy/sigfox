@@ -18,7 +18,7 @@ namespace AlertJob
         {
             var eventHubName = "dispatch";
             var consumerGroup = "alert";
-            var busConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoServiceBus"].ConnectionString;
+            var busConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoDispatchListener"].ConnectionString;
             var storageConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoStorage"].ConnectionString;
             if (!WebJobsHelper.RunAsWebJobs)
                 Console.CancelKeyPress += Console_CancelKeyPress;

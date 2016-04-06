@@ -48,16 +48,20 @@ namespace DecoderJob
             var retries = 3;
             while (retries > 0)
             {
+                var s = string.Empty;
                 try
                 {
                     retries--;
+                    s = "storage";
                     storageAccount = CloudStorageAccount.Parse(ConfigurationManager.ConnectionStrings["SigfoxDemoStorage"].ConnectionString);
                     var blobClient = storageAccount.CreateCloudBlobClient();
-                    blobContainer = blobClient.GetContainerReference("Device");
+                    blobContainer = blobClient.GetContainerReference("device");
                     blobContainer.SetPermissions(new BlobContainerPermissions() { PublicAccess = BlobContainerPublicAccessType.Off });
                     blobContainer.CreateIfNotExists();
+                    s = "cache";
                     cacheConnection = await ConnectionMultiplexer.ConnectAsync(ConfigurationManager.ConnectionStrings["SigfoxDemoCache"].ConnectionString);
                     cacheDatabase = cacheConnection.GetDatabase();
+                    s = "database";
                     sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["SigfoxDemoDatabase"].ConnectionString);
                     sqlConnection.Open();
                     sqlCommand = new SqlCommand("InsertMessage", sqlConnection) { CommandType = CommandType.StoredProcedure };
@@ -86,7 +90,7 @@ namespace DecoderJob
                 }
                 catch (Exception e)
                 {
-                    Console.Error.WriteLine("Error opening destination Event Hub: " + e.Message);
+                    Console.Error.WriteLine("Error opening destination Event Hub: " + e.Message + "(" + s + ")");
                     if (retries == 0)
                         throw;
                 }
@@ -158,7 +162,7 @@ namespace DecoderJob
             sqlCommand.Parameters["@Humidity"].Value = message.Humidity;
             sqlCommand.Parameters["@ILS"].Value = message.ILS;
             sqlCommand.Parameters["@Light"].Value = message.Light;
-            sqlCommand.Parameters["@Version"].Value = message.Version;
+            sqlCommand.Parameters["@Version"].Value = message.Version.ToString();
             sqlCommand.Parameters["@AlertCount"].Value = message.AlertCount;
             sqlCommand.Parameters["@TimeStamp"].Value = message.Time;
             sqlCommand.Parameters["@Duplicate"].Value = message.Duplicate;

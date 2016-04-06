@@ -8,6 +8,7 @@ namespace SensitLib
 {
     public class DecodedMessage
     {
+        private Version version;
         public string Device { get; set; }
         public string Data { get; set; }
         public Mode Mode { get; set; }
@@ -18,7 +19,19 @@ namespace SensitLib
         public double Humidity { get; set; }
         public bool ILS { get; set; }
         public double Light { get; set; }
-        public Version Version { get; set; }
+        public Version Version
+        {
+            get
+            {
+                return version ?? (version = new Version());
+            }
+            set
+            {
+                if ((value == null) || (value == version))
+                    return;
+                version = value;
+            }
+        }
         public int AlertCount { get; set; }
         public DateTime Time { get; set; }
         public bool Duplicate { get; set; }

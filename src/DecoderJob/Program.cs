@@ -20,7 +20,7 @@ namespace DecoderJob
             var eventHubName = "sigfoxdemo";
             var consumerGroup = "decoder";
             var eventProcessorName = "DecoderProcessor";
-            var busConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoServiceBus"].ConnectionString;
+            var busConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoIoTHub"].ConnectionString;
             var storageConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoStorage"].ConnectionString;
             if (!WebJobsHelper.RunAsWebJobs)
                 Console.CancelKeyPress += Console_CancelKeyPress;

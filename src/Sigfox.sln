@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailJob", "EmailJob\EmailJ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SigfoxDemoLib", "SigfoxDemoLib\SigfoxDemoLib.csproj", "{1FF45CEF-823D-4A43-A1C6-B5BA6D4A385E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlertLog", "AlertLog\AlertLog.csproj", "{B76375C1-08AC-4C15-8049-E5FF0DAEF762}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,10 @@ Global
 		{1FF45CEF-823D-4A43-A1C6-B5BA6D4A385E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FF45CEF-823D-4A43-A1C6-B5BA6D4A385E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1FF45CEF-823D-4A43-A1C6-B5BA6D4A385E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B76375C1-08AC-4C15-8049-E5FF0DAEF762}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B76375C1-08AC-4C15-8049-E5FF0DAEF762}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B76375C1-08AC-4C15-8049-E5FF0DAEF762}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B76375C1-08AC-4C15-8049-E5FF0DAEF762}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -133,6 +133,10 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="ConnectionStrings.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\sigfoxdemo - Web Deploy.pubxml" />
     <None Include="Properties\webjob-publish-settings.json" />

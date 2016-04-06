@@ -18,7 +18,7 @@ namespace DecoderJob
         {
             var eventHubName = "dispatch";
             var consumerGroup = "storage";
-            var busConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoServiceBus"].ConnectionString;
+            var busConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoDispatchListener"].ConnectionString;
             var storageConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoStorage"].ConnectionString;
             if (!WebJobsHelper.RunAsWebJobs)
                 Console.CancelKeyPress += Console_CancelKeyPress;
@@ -41,7 +41,7 @@ namespace DecoderJob
             }
             if (consumerGroup == null)
                 consumerGroup = eventHubClient.GetDefaultConsumerGroup().GroupName;
-            var eventProcessorHost = new EventProcessorHost("storageProcessor", eventHubClient.Path,
+            var eventProcessorHost = new EventProcessorHost("StorageProcessor", eventHubClient.Path,
                 consumerGroup, busConnectionString, storageConnectionString, eventHubName.ToLowerInvariant());
             eventProcessorHost.RegisterEventProcessorAsync<EventProcessor>().Wait();
             while (true)

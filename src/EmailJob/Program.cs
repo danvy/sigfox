@@ -19,7 +19,7 @@ namespace DecoderJob
             var eventHubName = "alert";
             var consumerGroup = "email";
             var eventProcessorName = "EmailAlertProcessor";
-            var busConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoServiceBus"].ConnectionString;
+            var busConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoAlertListener"].ConnectionString;
             var storageConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoStorage"].ConnectionString;
             if (!WebJobsHelper.RunAsWebJobs)
                 Console.CancelKeyPress += Console_CancelKeyPress;

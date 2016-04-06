@@ -7,22 +7,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
-namespace DispatcherLog
+namespace AlertLog
 {
     class Program
     {
         static bool breaking = false;
         static void Main(string[] args)
         {
-            var eventHubName = "dispatch";
+            var eventHubName = "alert";
             var consumerGroup = "log";
-            var busConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoDispatchListener"].ConnectionString;
+            var busConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoAlertListener"].ConnectionString;
             var storageConnectionString = ConfigurationManager.ConnectionStrings["SigfoxDemoStorage"].ConnectionString;
             Console.CancelKeyPress += Console_CancelKeyPress;
             var eventHubClient = EventHubClient.CreateFromConnectionString(busConnectionString, eventHubName);
             if (consumerGroup == null)
                 consumerGroup = eventHubClient.GetDefaultConsumerGroup().GroupName;
-            var eventProcessorHost = new EventProcessorHost("DispatchLogProcessor", eventHubClient.Path,
+            var eventProcessorHost = new EventProcessorHost("AlertLogProcessor", eventHubClient.Path,
                 consumerGroup, busConnectionString, storageConnectionString, eventHubName.ToLowerInvariant());
             eventProcessorHost.RegisterEventProcessorAsync<EventProcessor>().Wait();
             while (true)

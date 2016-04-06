@@ -56,10 +56,10 @@ namespace AlertJob
                     hubClient = EventHubClient.CreateFromConnectionString(
                         ConfigurationManager.ConnectionStrings["SigfoxDemoAlertSender"].ConnectionString,
                         "alert");
-                    cacheConnection = await ConnectionMultiplexer.ConnectAsync(CloudConfigurationManager.GetSetting("CacheConnectionString"));
+                    cacheConnection = await ConnectionMultiplexer.ConnectAsync(ConfigurationManager.ConnectionStrings["SigfoxDemoCache"].ConnectionString);
                     cacheDatabase = cacheConnection.GetDatabase();
-                    sqlConnection = new SqlConnection(CloudConfigurationManager.GetSetting("SqlConnectionString"));
-                    sqlConnection.Open();
+                    sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["SigfoxDemoDatabase"].ConnectionString);
+                    //sqlConnection.Open();
                     //sqlCommand = new SqlCommand("InsertAlert", sqlConnection) { CommandType = CommandType.StoredProcedure };
                     //sqlCommand.Parameters.Add(new SqlParameter("@Device", SqlDbType.VarChar));
                     retries = 0;
@@ -118,7 +118,7 @@ namespace AlertJob
         {
             if (cacheDatabase == null)
                 return;
-            string json = await cacheDatabase.StringGetAsync(message.Device);
+            string json = await cacheDatabase.StringGetAsync("message-" + message.Device);
             if (json == null)
                 return;
             DecodedMessage cached = null;
@@ -132,9 +132,10 @@ namespace AlertJob
             }
             if (cached == null)
                 return;
-            if ((message.Mode == Mode.Button) || (Math.Abs(message.Temperature - cached.Temperature) > 10))
+            if ((message.Type == FrameType.Alert) || (message.Mode == Mode.Button) || (Math.Abs(message.Temperature - cached.Temperature) > 10))
             {
                 var alert = new AlertMessage();
+                alert.Device = message.Device;
                 var alertMessage = JsonConvert.SerializeObject(alert);
                 await hubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(alertMessage)));
             }

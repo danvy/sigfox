@@ -48,9 +48,9 @@ namespace DecoderJob
                 try
                 {
                     retries--;
-                    var username = ConfigurationManager.ConnectionStrings["SendGridUser"];
-                    var pswd = System.Environment.GetEnvironmentVariable("SendGridPass");
-                    var apiKey = System.Environment.GetEnvironmentVariable("SendGridAPIKey");
+                    var username = ConfigurationManager.AppSettings["SendGridUser"];
+                    var pswd = ConfigurationManager.AppSettings["SendGridPass"];
+                    var apiKey = ConfigurationManager.AppSettings["SendGridAPIKey"];
                     transportWeb = new Web(apiKey);
                     retries = 0;
                 }
@@ -107,8 +107,12 @@ namespace DecoderJob
             }
         }
 
-        private async Task SendEmailAsync(AlertMessage messageObj)
+        private async Task SendEmailAsync(AlertMessage message)
         {
+            if (message == null)
+                return;
+            if (string.IsNullOrEmpty(message.Device))
+                return;
             var email = new SendGridMessage();
             email.From = new MailAddress("alex.danvy@microsoft.com", "Alex Danvy (Sigfox Demo)");
             List<String> recipients = new List<String>
@@ -117,8 +121,8 @@ namespace DecoderJob
             };
             email.AddTo(recipients);
             email.Subject = "Sigfox Demo Alert";
-            email.Html = "<p><b>Sigfox Demo Alert!</b></p><p></p>";
-            email.Text = "Sigfox Demo Alert\n";
+            email.Html = string.Format("<p><b>Sigfox Demo Alert!</b></p><p>The device '{0}' raised an alert.</p>", message.Device);
+            email.Text = string.Format("Sigfox Demo Alert\nThe device '{0}' raised an alert.", message.Device);
             await transportWeb.DeliverAsync(email);
         }
     }
